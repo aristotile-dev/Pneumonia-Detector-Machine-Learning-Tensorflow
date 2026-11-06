@@ -27,10 +27,25 @@ MAX_UPLOAD_BYTES = 10 * 1024 * 1024
 IMG_SIZE = (150, 150)  # must match training
 
 app = FastAPI(title="Pneumonia Detector API")
+def _valid_origin_regex() -> str | None:
+    """Return ALLOWED_ORIGIN_REGEX only if it compiles; a bad value must not take the whole API down."""
+    import re
+
+    pattern = os.getenv("ALLOWED_ORIGIN_REGEX", "").strip()
+    if not pattern:
+        return None
+    try:
+        re.compile(pattern)
+    except re.error:
+        print(f"Ignoring invalid ALLOWED_ORIGIN_REGEX: {pattern!r}")
+        return None
+    return pattern
+
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
-    allow_origin_regex=os.getenv("ALLOWED_ORIGIN_REGEX") or None,
+    allow_origin_regex=_valid_origin_regex(),
     allow_methods=["*"],
     allow_headers=["*"],
 )
