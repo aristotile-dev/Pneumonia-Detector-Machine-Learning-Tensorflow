@@ -219,19 +219,27 @@ def call_llm(system: str, turns: list[dict]) -> str:
         raise HTTPException(503, "AI is not configured.")
     try:
         if groq_key:
+            groq_model = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
+            body = {
+                "model": groq_model,
+                "messages": [{"role": "system", "content": system}, *turns],
+                # gpt-oss models spend part of this budget on hidden reasoning, so keep it generous
+                "max_tokens": 1024,
+            }
+            if groq_model.startswith("openai/gpt-oss"):
+                body["reasoning_effort"] = "low"
             r = requests.post(
                 "https://api.groq.com/openai/v1/chat/completions",
                 headers={"Authorization": f"Bearer {groq_key}"},
-                json={
-                    "model": os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile"),
-                    "messages": [{"role": "system", "content": system}, *turns],
-                    "max_tokens": 400,
-                },
-                timeout=30,
+                json=body,
+                timeout=45,
             )
             r.raise_for_status()
-            return r.json()["choices"][0]["message"]["content"].strip()
-        model = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+            text = (r.json()["choices"][0]["message"].get("content") or "").strip()
+            if not text:
+                raise ValueError("empty reply")
+            return text
+        model = os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite")
         r = requests.post(
             f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
             headers={"x-goog-api-key": gemini_key},
