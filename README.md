@@ -19,7 +19,7 @@ This tool is built with Streamlit and is designed to provide a fast, accessible,
 
 ## 🚀 Live App
 
-**[Click Here To Use Pneumonia - Detector](https://pneumonia-detector-machine-learning-tensorflow-totz7.streamlit.app/)**
+**[Click Here To Use Pneumonia - Detector](https://pneumonia-detector-machine-learning-tensorflow-aristotile-dev.streamlit.app/)**
 
 ---
 
