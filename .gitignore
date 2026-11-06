@@ -1,0 +1,5 @@
+# Model weights are hosted on Hugging Face, never commit them
+*.keras
+*.h5
+# Design-tool working files, not part of the app
+.impeccable/
