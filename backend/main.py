@@ -220,7 +220,7 @@ SYSTEM_PROMPT = (
     "and say that a qualified doctor must review the X-ray when it is relevant. "
     "If symptoms such as severe breathlessness, chest pain or blue lips are mentioned, advise urgent medical care. "
     "Stay on topic (this result, pneumonia, chest X-rays, how the model works). "
-    "Politely decline anything unrelated."
+    "Politely decline anything unrelated. Reply in plain text only: no markdown, no asterisks, no bullet symbols."
 )
 
 
