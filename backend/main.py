@@ -8,6 +8,7 @@ Endpoints
 import base64
 import io
 import os
+import tempfile
 import threading
 
 import gdown
@@ -18,7 +19,7 @@ from PIL import Image
 from pydantic import BaseModel
 
 MODEL_FILE_ID = os.getenv("MODEL_FILE_ID", "1oMcpKYkEqzDiaCoNx6D1xQAFer8x1FWq")
-MODEL_PATH = os.getenv("MODEL_PATH", "pneumonia_model_94.keras")
+MODEL_PATH = os.getenv("MODEL_PATH", os.path.join(tempfile.gettempdir(), "pneumonia_model_94.keras"))  # /tmp is the only writable place on serverless hosts
 # Model is hosted on Hugging Face. Set MODEL_URL="" to fall back to the old Google Drive copy.
 MODEL_URL = os.getenv("MODEL_URL", "https://huggingface.co/totz07/pneumonia-detector-densenet121/resolve/main/pneumonia_model_94.keras")
 HF_TOKEN = os.getenv("HF_TOKEN", "")  # only needed if the Hugging Face repo is private
