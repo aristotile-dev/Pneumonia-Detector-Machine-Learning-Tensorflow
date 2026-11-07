@@ -1,134 +1,139 @@
-#  Pneumonia Detection using Deep Learning (TensorFlow)
+<p align="center">
+  <a href="https://pneumonia-detector-machine-learning.vercel.app">
+    <img src="assets/banner.png" alt="PneumoScan: chest X-ray in, evidence out" width="100%">
+  </a>
+</p>
 
-![Accuracy](https://img.shields.io/badge/Accuracy-94.63%25-brightgreen?style=for-the-badge)
-![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)
-![Python](https://img.shields.io/badge/Python-3.10%2B-blue?style=for-the-badge&logo=python&logoColor=white)
-![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
-![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)
-<br>
-![Machine Learning](https://img.shields.io/badge/Machine%20Learning-FF6F00?style=for-the-badge&logo=tensorflow)
-![Deep Learning](https://img.shields.io/badge/Deep%20Learning-D00000?style=for-the-badge&logo=keras)
-![TensorFlow](https://img.shields.io/badge/TensorFlow-FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white)
-![Keras](https://img.shields.io/badge/Keras-D00000?style=for-the-badge&logo=keras&logoColor=white)
+<p align="center">
+  <a href="https://pneumonia-detector-machine-learning.vercel.app"><b>Live demo</b></a>
+  &nbsp;·&nbsp;
+  <a href="#how-it-works">How it works</a>
+  &nbsp;·&nbsp;
+  <a href="#run-it-yourself">Run it yourself</a>
+</p>
 
-**PneumoScan** is a web app that classifies chest X-rays as "Normal" or "Pneumonia" with a **TensorFlow** **DenseNet121** model, shows *where* the model looked with a Grad-CAM heatmap, and explains the result in plain language with an LLM.
+<p align="center">
+  <img alt="Validation accuracy" src="https://img.shields.io/badge/validation%20accuracy-94.63%25-0a2bcb?style=flat-square">
+  <img alt="Model" src="https://img.shields.io/badge/model-DenseNet121-ffd21f?style=flat-square&labelColor=061a85">
+  <img alt="Frontend" src="https://img.shields.io/badge/UI-Next.js%2015-000000?style=flat-square&logo=nextdotjs">
+  <img alt="Backend" src="https://img.shields.io/badge/API-FastAPI%20%2B%20TensorFlow-009688?style=flat-square&logo=fastapi&logoColor=white">
+  <img alt="License" src="https://img.shields.io/badge/license-MIT-lightgrey?style=flat-square">
+</p>
 
-It is a screening aid and a portfolio project, **not a diagnosis**: a qualified doctor must review every X-ray.
+PneumoScan is a chest X-ray screening tool that returns more than a label. For every image it reports a verdict with a confidence score, a Grad-CAM heatmap of the region that drove the prediction, and a plain-language explanation that can be explored through a chat.
 
----
+The live demo includes sample X-rays that can be run with a single click, and it accepts uploads of your own images.
 
-## 🚀 Live App
+> **PneumoScan is a screening demonstration, not a diagnostic tool.** A qualified clinician must review every X-ray. Anyone experiencing severe breathlessness or chest pain should seek medical care immediately.
 
-**[Open PneumoScan](https://pneumonia-detector-machine-learning.vercel.app)**
+<p align="center">
+  <img src="assets/hero.png" alt="The PneumoScan landing page" width="100%">
+</p>
 
-The backend may need a few seconds to wake up on the first request.
+## Features
 
----
+<p align="center">
+  <img src="assets/result.png" alt="A pneumonia result with a Grad-CAM heatmap, an explanation and the chat panel" width="100%">
+</p>
 
-## 📋 Features
+* **Verdict and confidence.** Each X-ray is classified as NORMAL or PNEUMONIA, together with the model's confidence in that result.
+* **Visual evidence.** A Grad-CAM heatmap is displayed beside the original image, with a comparison slider and a zoom lens for closer inspection.
+* **Plain-language explanation.** A language model (Groq, with Gemini as a fallback) explains what the result does and does not mean. It is instructed never to diagnose or recommend treatment.
+* **Contextual chat.** Follow-up questions are answered in the context of the result. Unrelated questions are politely declined.
+* **Shareable result card.** Any result can be saved as a PNG image.
+* **Graceful degradation.** The prediction is still displayed when the heatmap or the language model is unavailable.
 
-* **Upload or pick a sample:** Use your own chest X-ray (JPG or PNG, up to 10 MB) or one of the bundled samples.
-* **Prediction with confidence:** Classifies the image as **NORMAL** or **PNEUMONIA** and shows the model's confidence.
-* **Heatmap evidence:** A Grad-CAM overlay shows which regions drove the score. A zoom lens lets you inspect the X-ray.
-* **Plain-language explanation and chat:** An LLM (Groq, with Gemini as fallback) explains the result and answers follow-up questions. It is instructed not to diagnose or give treatment advice.
-* **Shareable result card:** Download the result as a PNG.
-* **Degrades gracefully:** If the heatmap or the AI explanation is unavailable, the prediction still shows.
+## How it works
 
-## 🏗️ Architecture
+The path of an uploaded X-ray through the system:
 
+```mermaid
+flowchart TD
+    A["Your chest X-ray"] --> B["Resize to 150 × 150"]
+    B --> C["DenseNet121 scores it from 0 to 1"]
+    C --> D{"Above 0.5?"}
+    C --> G["Grad-CAM paints the heatmap"]
+    D -->|Yes| E["PNEUMONIA"]
+    D -->|No| F["NORMAL"]
+    E --> H["Groq or Gemini gets the label and confidence only"]
+    F --> H
+    H --> I["Plain-language explanation and chat"]
 ```
-Browser ──► Next.js UI (Vercel) ──► FastAPI + TensorFlow API ──► Groq / Gemini
-                                         │
-                                         └─ downloads the .keras model from Hugging Face on first start
+
+Only the predicted label and its confidence are sent to the language model. The image itself is never shared with it.
+
+The architecture of the deployed system:
+
+```mermaid
+flowchart LR
+    U["Browser"] --> V["Next.js UI<br/>Vercel"]
+    V -->|"/predict, /explain, /chat"| A["FastAPI + TensorFlow<br/>Docker host"]
+    A -->|"first start"| M[("Model on<br/>Hugging Face")]
+    A --> L["Groq / Gemini"]
 ```
 
-* `frontend/` Next.js 15 (App Router, plain JS and CSS)
-* `backend/` FastAPI API with `/health`, `/predict`, `/explain`, `/chat`
-* Model: [totz07/pneumonia-detector-densenet121](https://huggingface.co/totz07/pneumonia-detector-densenet121) on Hugging Face
-## ☁️ Deployment
+The API exposes four endpoints: `/health`, `/predict`, `/explain` and `/chat`. The training notebook is available in [`Notebook/`](Notebook).
 
-Vercel cannot host the API: its dependencies bundle to about 1.2 GB, over Vercel's 500 MB Python function limit. Run the API on any Docker host with at least 2 GB of RAM (`backend/Dockerfile` listens on `$PORT`). It has been tested on Railway and on a Hugging Face Space.
+## Run it yourself
 
-**Backend variables**
-* `GROQ_API_KEY` or `GEMINI_API_KEY`: one is enough
-* `ALLOWED_ORIGINS`: the frontend URL, comma-separated for several
-* Optional: `ALLOWED_ORIGIN_REGEX`, `MODEL_URL`, `HF_TOKEN` (see `backend/.env.example`)
+```bash
+git clone https://github.com/aristotile-dev/Pneumonia-Detector-Machine-Learning-Tensorflow.git
+cd Pneumonia-Detector-Machine-Learning-Tensorflow
+```
 
-Check `/health`: `model_loaded: true` means the model is ready.
+**Backend.** The model is downloaded automatically on first start. Set `GROQ_API_KEY` or `GEMINI_API_KEY` to enable the explanation and chat (see `backend/.env.example`).
 
-**Frontend (Vercel):** set the Root Directory to `frontend` and `NEXT_PUBLIC_API_URL` to the API base URL, with no trailing slash. It is baked in at build time, so redeploy after changing it.
+```bash
+cd backend
+pip install -r requirements.txt
+uvicorn main:app --reload
+```
 
----
+**Frontend**, in a second terminal:
 
-## 🧠 The Machine Learning Model
+```bash
+cd frontend
+cp .env.example .env.local
+npm install
+npm run dev
+```
 
-The core of this project is the **deep learning model**. The final model achieves **94.63% accuracy** through a process of iteration and problem-solving.
+Then open http://localhost:3000.
 
-### 1. Model Architecture
-* **Transfer Learning:** The model is built using **Transfer Learning** with the **DenseNet121** architecture, pre-trained on the ImageNet dataset.
-* **Custom Head:** The pre-trained base was frozen, and a new classification "head" was added.
-* **Strong Regularization:** To prevent overfitting, the custom head includes:
-    * `kernel_regularizer=L2(0.001)`
-    * `Dropout(0.5)`
+## Deploying
 
-### 2. The Dataset & Training
-* **Data Source:** The project uses the "Chest X-Ray Images (Pneumonia)" dataset from Kaggle.
-* **Addressing Domain Shift:** Initial training revealed a "domain shift" problem—the model performed well on validation data from the `train` folder (96%) but poorly on the `test` folder (87%).
-* **Solution (Data Merging):** To solve this, all 5,856 images from the `train`, `test`, and `val` folders were **merged into a single master dataset**. This master dataset was then re-split (80/20) into a new, more reliable training set (4,684 images) and validation set (1,172 images).
-* **Final Training:** The model was trained on this new, mixed dataset using:
-    * `Adam` optimizer (learning rate: 0.0001)
-    * `EarlyStopping` callback (monitoring `val_loss`)
+The API cannot run as a Vercel function: its dependencies total about 1.2 GB, above Vercel's 500 MB limit. It requires a Docker host with at least 2 GB of RAM. `backend/Dockerfile` listens on `$PORT`.
 
-This final approach solved the domain shift and resulted in a stable, generalized model with **94.63% accuracy** on the new validation set.
+| Backend variable | Required | Description |
+| :--- | :---: | :--- |
+| `GROQ_API_KEY` or `GEMINI_API_KEY` | One of the two | Enables the explanation and chat. Groq takes precedence when both are set. |
+| `ALLOWED_ORIGINS` | Yes | The frontend origin. Separate several origins with commas. |
+| `MODEL_URL`, `HF_TOKEN` | No | Load the model from a different location. |
 
----
+A response of `model_loaded: true` from `/health` confirms that the model is ready.
 
-## 🛠️ Tech Stack
+For the frontend on Vercel, set the Root Directory to `frontend` and set `NEXT_PUBLIC_API_URL` to the API's base URL without a trailing slash. The value is embedded at build time, so redeploy after changing it.
 
-| Technology | Purpose |
+## Technology
+
+| Layer | Technology |
 | :--- | :--- |
-| **TensorFlow & Keras** | **Core ML library for building, training, and running the `DenseNet121` model.** |
-| **Next.js** | The web UI (hosted on Vercel). |
-| **FastAPI** | The API that serves predictions, heatmaps, explanations and chat. |
-| **Python** | The backend language. |
-| **Pillow (PIL)** | For loading, resizing, and processing user-uploaded images. |
-| **NumPy** | For numerical operations and preparing image arrays for the model. |
-| **Hugging Face Hub** | Hosts the trained `.keras` model; the backend downloads it on first start. |
-| **Groq / Gemini** | LLMs for the plain-language explanation and chat. |
-| **Google Colab** | Used for GPU-powered model training and experimentation. |
+| Model | DenseNet121 with transfer learning, built with TensorFlow and Keras |
+| Explainability | Grad-CAM heatmaps |
+| Image processing | Pillow and NumPy |
+| API | FastAPI served by Uvicorn |
+| Interface | Next.js 15 (App Router), plain CSS and the Archivo typeface |
+| Language model | Groq (`openai/gpt-oss-120b`), with Gemini (`gemini-3.5-flash-lite`) as a fallback |
+| Model hosting | Hugging Face Hub |
 
----
+## License
 
-## How to Run Locally
+Released under the MIT License. Copyright (c) 2025 Aristotile S.
 
-1.  **Clone the repository:**
-    ```bash
-    git clone https://github.com/aristotile-dev/Pneumonia-Detector-Machine-Learning-Tensorflow.git
-    cd Pneumonia-Detector-Machine-Learning-Tensorflow
-    ```
+<details>
+<summary>Full license text</summary>
 
-2.  **Run the backend** (downloads the model from Hugging Face on first start; set `GROQ_API_KEY` or `GEMINI_API_KEY` for explanations and chat, see `backend/.env.example`):
-    ```bash
-    cd backend
-    pip install -r requirements.txt
-    uvicorn main:app --reload
-    ```
-
-3.  **Run the frontend** in a second terminal:
-    ```bash
-    cd frontend
-    cp .env.example .env.local
-    npm install
-    npm run dev
-    ```
-    Open http://localhost:3000.
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License.
-
+```
 MIT License
 
 Copyright (c) 2025 Aristotile S
@@ -150,3 +155,6 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+```
+
+</details>
