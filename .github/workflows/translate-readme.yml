@@ -36,7 +36,7 @@ jobs:
         run: |
           git config user.name "Aristotile S"
           git config user.email "336882711+aristotile-dev@users.noreply.github.com"
-          git add docs/translations README.md
+          git add -A
           if git diff --cached --quiet; then
             echo "No changes to commit."
           else
