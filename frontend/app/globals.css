@@ -225,7 +225,7 @@ h1 span { white-space: nowrap; }
 h2 { margin: 0 0 clamp(24px, 4vw, 44px); font-size: clamp(2rem, 4.4vw, 3.5rem); line-height: 1; text-wrap: balance; }
 .rail-wrap { position: relative; }
 .rail { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 28px; }
-@media (max-width: 1180px) { .rail { grid-template-columns: repeat(2, minmax(0, 420px)); gap: 20px; } }
+@media (max-width: 1180px) { .rail { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; } }
 @media (max-width: 560px) { .rail { grid-template-columns: minmax(0, 1fr); } }
 .card { container-type: inline-size; position: relative; aspect-ratio: 1; overflow: hidden; border-radius: var(--r); background: var(--cobalt-deep); color: var(--white); }
 .card-body { pointer-events: none; position: absolute; left: 0; right: 0; bottom: 0; z-index: 1; padding: 96px 22px 22px; background: linear-gradient(to top, rgba(6, 26, 133, 0.97) 42%, rgba(6, 26, 133, 0)); }
