@@ -45,9 +45,18 @@ Browser ──► Next.js UI (Vercel) ──► FastAPI + TensorFlow API ──�
 * `frontend/` Next.js 15 (App Router, plain JS and CSS)
 * `backend/` FastAPI API with `/health`, `/predict`, `/explain`, `/chat`
 * Model: [totz07/pneumonia-detector-densenet121](https://huggingface.co/totz07/pneumonia-detector-densenet121) on Hugging Face
-* `app.py` is the original Streamlit version, kept for reference
+## ☁️ Deployment
 
-See [DEPLOY.md](DEPLOY.md) for deployment.
+Vercel cannot host the API: its dependencies bundle to about 1.2 GB, over Vercel's 500 MB Python function limit. Run the API on any Docker host with at least 2 GB of RAM (`backend/Dockerfile` listens on `$PORT`). It has been tested on Railway and on a Hugging Face Space.
+
+**Backend variables**
+* `GROQ_API_KEY` or `GEMINI_API_KEY`: one is enough
+* `ALLOWED_ORIGINS`: the frontend URL, comma-separated for several
+* Optional: `ALLOWED_ORIGIN_REGEX`, `MODEL_URL`, `HF_TOKEN` (see `backend/.env.example`)
+
+Check `/health`: `model_loaded: true` means the model is ready.
+
+**Frontend (Vercel):** set the Root Directory to `frontend` and `NEXT_PUBLIC_API_URL` to the API base URL, with no trailing slash. It is baked in at build time, so redeploy after changing it.
 
 ---
 
