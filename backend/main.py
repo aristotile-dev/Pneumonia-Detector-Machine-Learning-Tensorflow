@@ -96,7 +96,7 @@ def get_model():
 
 @app.on_event("startup")
 def warm_up():
-    # Load in a background thread so the port opens immediately (Railway health check).
+    # Load in a background thread so the port opens immediately (host health checks).
     def _load():
         try:
             get_model()

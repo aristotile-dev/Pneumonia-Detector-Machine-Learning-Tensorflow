@@ -3,33 +3,51 @@
 ![Accuracy](https://img.shields.io/badge/Accuracy-94.63%25-brightgreen?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue?style=for-the-badge&logo=python&logoColor=white)
-![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)
+![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)
 <br>
 ![Machine Learning](https://img.shields.io/badge/Machine%20Learning-FF6F00?style=for-the-badge&logo=tensorflow)
 ![Deep Learning](https://img.shields.io/badge/Deep%20Learning-D00000?style=for-the-badge&logo=keras)
 ![TensorFlow](https://img.shields.io/badge/TensorFlow-FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white)
 ![Keras](https://img.shields.io/badge/Keras-D00000?style=for-the-badge&logo=keras&logoColor=white)
-</div>
 
-This project is an interactive web application that uses a **TensorFlow**-based **Convolutional Neural Network (CNN)** to classify chest X-ray images as either "Normal" or "Pneumonia."
+**PneumoScan** is a web app that classifies chest X-rays as "Normal" or "Pneumonia" with a **TensorFlow** **DenseNet121** model, shows *where* the model looked with a Grad-CAM heatmap, and explains the result in plain language with an LLM.
 
-This tool is built with Streamlit and is designed to provide a fast, accessible, and high-accuracy analysis, demonstrating a practical application of deep learning for social impact in medical diagnostics.
+It is a screening aid and a portfolio project, **not a diagnosis**: a qualified doctor must review every X-ray.
 
 ---
 
 ## 🚀 Live App
 
-**[Click Here To Use Pneumonia - Detector](https://pneumonia-detector-machine-learning-tensorflow-aristotile-dev.streamlit.app/)**
+**[Open PneumoScan](https://pneumonia-detector-machine-learning.vercel.app)**
+
+The backend may need a few seconds to wake up on the first request.
 
 ---
 
 ## 📋 Features
 
-* **File Uploader:** Allows users to upload their own chest X-ray images (JPG, PNG, JPEG).
-* **Deep Learning Prediction:** Uses a trained **TensorFlow/Keras** model to analyze the image in real-time.
-* **Clear Results:** Immediately classifies the image as **"NORMAL"** or **"PNEUMONIA"**.
-* **Confidence Score:** Displays the model's confidence percentage for the prediction.
-* **Social Impact:** Acts as a proof-of-concept for a tool that could assist radiologists or be used in areas with limited access to specialists.
+* **Upload or pick a sample:** Use your own chest X-ray (JPG or PNG, up to 10 MB) or one of the bundled samples.
+* **Prediction with confidence:** Classifies the image as **NORMAL** or **PNEUMONIA** and shows the model's confidence.
+* **Heatmap evidence:** A Grad-CAM overlay shows which regions drove the score. A zoom lens lets you inspect the X-ray.
+* **Plain-language explanation and chat:** An LLM (Groq, with Gemini as fallback) explains the result and answers follow-up questions. It is instructed not to diagnose or give treatment advice.
+* **Shareable result card:** Download the result as a PNG.
+* **Degrades gracefully:** If the heatmap or the AI explanation is unavailable, the prediction still shows.
+
+## 🏗️ Architecture
+
+```
+Browser ──► Next.js UI (Vercel) ──► FastAPI + TensorFlow API ──► Groq / Gemini
+                                         │
+                                         └─ downloads the .keras model from Hugging Face on first start
+```
+
+* `frontend/` Next.js 15 (App Router, plain JS and CSS)
+* `backend/` FastAPI API with `/health`, `/predict`, `/explain`, `/chat`
+* Model: [totz07/pneumonia-detector-densenet121](https://huggingface.co/totz07/pneumonia-detector-densenet121) on Hugging Face
+* `app.py` is the original Streamlit version, kept for reference
+
+See [DEPLOY.md](DEPLOY.md) for deployment.
 
 ---
 
@@ -61,11 +79,13 @@ This final approach solved the domain shift and resulted in a stable, generalize
 | Technology | Purpose |
 | :--- | :--- |
 | **TensorFlow & Keras** | **Core ML library for building, training, and running the `DenseNet121` model.** |
-| **Streamlit** | To build the interactive web app and user interface. |
-| **Python** | The primary programming language. |
+| **Next.js** | The web UI (hosted on Vercel). |
+| **FastAPI** | The API that serves predictions, heatmaps, explanations and chat. |
+| **Python** | The backend language. |
 | **Pillow (PIL)** | For loading, resizing, and processing user-uploaded images. |
 | **NumPy** | For numerical operations and preparing image arrays for the model. |
-| **Gdown** | To download the saved `.keras` model from Google Drive when the app starts. |
+| **Hugging Face Hub** | Hosts the trained `.keras` model; the backend downloads it on first start. |
+| **Groq / Gemini** | LLMs for the plain-language explanation and chat. |
 | **Google Colab** | Used for GPU-powered model training and experimentation. |
 
 ---
@@ -74,21 +94,25 @@ This final approach solved the domain shift and resulted in a stable, generalize
 
 1.  **Clone the repository:**
     ```bash
-    git clone [https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git](https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git)
-    cd YOUR_REPO_NAME
+    git clone https://github.com/aristotile-dev/Pneumonia-Detector-Machine-Learning-Tensorflow.git
+    cd Pneumonia-Detector-Machine-Learning-Tensorflow
     ```
 
-2.  **Install dependencies:**
-    Make sure you have a `requirements.txt` file with the libraries listed in the Tech Stack.
+2.  **Run the backend** (downloads the model from Hugging Face on first start; set `GROQ_API_KEY` or `GEMINI_API_KEY` for explanations and chat, see `backend/.env.example`):
     ```bash
+    cd backend
     pip install -r requirements.txt
+    uvicorn main:app --reload
     ```
 
-3.  **Run the Streamlit app:**
-    The app will download the model from Google Drive on the first run.
+3.  **Run the frontend** in a second terminal:
     ```bash
-    streamlit run app.py
+    cd frontend
+    cp .env.example .env.local
+    npm install
+    npm run dev
     ```
+    Open http://localhost:3000.
 
 ---
 

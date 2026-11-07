@@ -7,7 +7,7 @@
 web
 
 ## Stack
-Existing: Next.js 15 (App Router, plain JS, plain CSS) frontend on Vercel; FastAPI + TensorFlow backend on Railway.
+Existing: Next.js 15 (App Router, plain JS, plain CSS) frontend on Vercel; FastAPI + TensorFlow backend on a Hugging Face Space (Docker-capable host; Railway also tested).
 
 ## Users
 Primary: recruiters and hiring engineers viewing the owner's ML portfolio, who will upload a sample X-ray and judge craft in under a minute. Secondary (unconfirmed): general visitors trying the demo.
