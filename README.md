@@ -20,6 +20,9 @@
   <img alt="License" src="https://img.shields.io/badge/license-MIT-lightgrey?style=flat-square">
 </p>
 
+<!-- translations:start -->
+<!-- translations:end -->
+
 PneumoScan is a chest X-ray screening tool that returns more than a label. For every image it reports a verdict with a confidence score, a Grad-CAM heatmap of the region that drove the prediction, and a plain-language explanation that can be explored through a chat.
 
 The live demo includes sample X-rays that can be run with a single click, and it accepts uploads of your own images.
@@ -42,6 +45,8 @@ The live demo includes sample X-rays that can be run with a single click, and it
 * **Contextual chat.** Follow-up questions are answered in the context of the result. Unrelated questions are politely declined.
 * **Shareable result card.** Any result can be saved as a PNG image.
 * **Graceful degradation.** The prediction is still displayed when the heatmap or the language model is unavailable.
+
+<a id="how-it-works"></a>
 
 ## How it works
 
@@ -73,6 +78,8 @@ flowchart LR
 ```
 
 The API exposes four endpoints: `/health`, `/predict`, `/explain` and `/chat`. The training notebook is available in [`Notebook/`](Notebook).
+
+<a id="run-it-yourself"></a>
 
 ## Run it yourself
 
