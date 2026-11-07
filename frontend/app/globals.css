@@ -318,6 +318,11 @@ footer p { margin: 0; color: #46507a; font-size: 14px; }
 footer a { color: var(--cobalt); font-weight: 600; font-size: 14px; text-underline-offset: 4px; }
 footer a:hover { color: var(--cobalt-deep); }
 footer :focus-visible { outline-color: var(--cobalt); }
+/* Phones: one clean left-aligned stack instead of a wrapped, half-justified row. */
+@media (max-width: 560px) {
+  footer { flex-direction: column; align-items: flex-start; gap: 8px; padding: 22px var(--edge) 26px; }
+  footer a { display: inline-flex; align-items: center; min-height: 44px; }
+}
 
 @media (prefers-reduced-motion: reduce) {
   .sign-input.flash { animation: none; }
