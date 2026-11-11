@@ -333,3 +333,11 @@ footer :focus-visible { outline-color: var(--cobalt); }
   .sweep { top: 50%; }
   .samples img, .drop { transition: none; }
 }
+
+/* The logo and name are a link home. */
+a.brand { color: inherit; }
+a.brand, a.foot-brand { text-decoration: none; cursor: pointer; }
+a.brand:focus-visible, a.foot-brand:focus-visible { outline: 2px solid var(--yellow); outline-offset: 4px; border-radius: 6px; }
+a.brand .logo { transition: transform 0.25s var(--ease); }
+a.brand:hover .logo { transform: rotate(-6deg) scale(1.06); }
+@media (prefers-reduced-motion: reduce) { a.brand:hover .logo { transform: none; } }

@@ -433,6 +433,13 @@ export default function Home() {
     }
   }
 
+  // The logo and name go home: back to the top of the page, with no #hash left in the address bar.
+  function goHome(e) {
+    e?.preventDefault();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (window.location.hash) window.history.replaceState(null, "", window.location.pathname + window.location.search);
+  }
+
   function goUpload(e) {
     e?.preventDefault();
     document.getElementById("desk")?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -504,10 +511,10 @@ export default function Home() {
   return (
     <main>
       <header className="nav">
-        <span className="brand">
+        <a className="brand" href="/" aria-label="PneumoScan, back to the top" onClick={goHome}>
           <img className="logo" src="/logo.png" alt="" width="34" height="32" />
           PneumoScan
-        </span>
+        </a>
         <nav aria-label="Page sections">
           <a href="#how" className={active === "how" ? "on" : ""}>How it works</a>
           <a href="#limits" className={active === "limits" ? "on" : ""}>Accuracy</a>
@@ -764,10 +771,10 @@ export default function Home() {
       </section>
 
       <footer>
-        <span className="foot-brand">
+        <a className="foot-brand" href="/" aria-label="PneumoScan, back to the top" onClick={goHome}>
           <span className="foot-logo"><img src="/logo.png" alt="" /></span>
           PneumoScan
-        </span>
+        </a>
         <p>Not a doctor. Get it checked IRL.</p>
         <a href="https://github.com/aristotile-dev/Pneumonia-Detector-Machine-Learning-Tensorflow">Source and training notebook on GitHub</a>
       </footer>
